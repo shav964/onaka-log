@@ -4,7 +4,7 @@ import { h, toast } from './ui.js';
 import {
   state, bus, load, dailyFor, weeklyFor, stoolsOn, dailiesBetween, intakeName, groupOf, medName,
 } from './store.js';
-import { BRISTOL, SLEEP_LABEL, STOOL_DETAIL, RED_FLAG_COLORS } from './config.js';
+import { BRISTOL, SLEEP_LABEL, STOOL_DETAIL, RED_FLAG_COLORS, SYMPTOMS } from './config.js';
 import {
   today, addDays, fmtDate, fmtTime, fmtDateTime, WD, parseYmd, entryDate,
   defaultDailyDate, dailyDeadline, weekStart, lastSunday,
@@ -89,7 +89,8 @@ function mealCard(e) {
 function symptomCard(e) {
   return h('button', { type: 'button', class: 'card', onclick: () => openEntry(e) },
     h('div', { class: 'card-time' }, fmtTime(e.at), h('span', { class: 'card-type' }, '症状')),
-    h('div', { class: 'card-sub' }, '腹痛 ', h('b', null, e.data.pain), ' ・ 張り ', h('b', null, e.data.bloating)));
+    h('div', { class: 'card-sub' }, SYMPTOMS.filter(([k]) => e.data[k] != null).map(([k, label], i) =>
+      [i ? ' ・ ' : '', label.replace(/（.*）/, '') + ' ', h('b', null, e.data[k])])));
 }
 
 function dailyCard(e) {

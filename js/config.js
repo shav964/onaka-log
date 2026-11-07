@@ -142,6 +142,13 @@ export const STOOL_DETAIL = [
 // 受診をすすめる色
 export const RED_FLAG_COLORS = ['white', 'black', 'red'];
 
+// 症状の臨時記録（0〜10。どれか1つ以上）
+export const SYMPTOMS = [
+  ['pain', '腹痛'],
+  ['bloating', '張り・膨満感'],
+  ['heaviness', '胃もたれ（胃の重さ・むかつき）'],
+];
+
 export const WEEKLY_Q = [
   { key: 'painSeverity', label: '腹痛の強さ', lo: 'なし', hi: 'とても強い' },
   { key: 'bloatingSeverity', label: 'お腹の張りの強さ', lo: 'なし', hi: 'とても強い' },

@@ -7,7 +7,7 @@ import {
 } from './store.js';
 import {
   BRISTOL, STOOL_DETAIL, RED_FLAG_COLORS, GROUPS, GAS_FREQ, GAS_SMELL, SLEEP,
-  WEEKLY_Q, severityText, sleepQualityText, sssLevel,
+  WEEKLY_Q, SYMPTOMS, severityText, sleepQualityText, sssLevel,
 } from './config.js';
 import {
   today, ymd, parseYmd, addDays, fmtDate, fmtDateTime, toInputDT, fromInputDT, uid, clone,
@@ -542,17 +542,22 @@ export function openSymptom(existing) {
   const sheet = openSheet({
     title: existing ? '症状の記録を修正' : '症状の記録（任意）',
     body: [
-      h('div', { class: 'note' }, 'いま、この瞬間の強さを記録します。'),
+      h('div', { class: 'note' }, 'いま、この瞬間の強さを記録します。気になる症状だけ選べばOK（もう一度押すと外れます）。'),
       timeField(() => at, (v) => { at = v; }),
-      field('腹痛', scale(() => d.pain, (v) => { d.pain = v; }, severityText), { key: 'pain', req: true }),
-      field('張り・膨満感', scale(() => d.bloating, (v) => { d.bloating = v; }, severityText), { key: 'bloating', req: true }),
+      SYMPTOMS.map(([k, label]) => field(label, scale(() => d[k], (v) => {
+        if (v === undefined) delete d[k]; else d[k] = v;
+        sheet.body.querySelectorAll('.missing').forEach((el) => el.classList.remove('missing'));
+      }, severityText, { clearable: true }), { key: k })),
     ],
     foot: footButtons(save, deleter(existing, { close: () => sheet.close() }, '症状')),
   });
   async function save() {
     if (saving) return;
-    const miss = ['pain', 'bloating'].filter((k) => d[k] == null);
-    if (miss.length) { markMissing(sheet, miss); toast('腹痛と張りを選んでください'); return; }
+    if (SYMPTOMS.every(([k]) => d[k] == null)) {
+      markMissing(sheet, SYMPTOMS.map(([k]) => k));
+      toast('どれか1つは選んでください');
+      return;
+    }
     saving = true;
     await saveEntry({ id: existing?.id || uid(), type: 'symptom', at, data: d, note: existing?.note || '' });
     sheet.close();
@@ -572,7 +577,7 @@ export function openPlusMenu() {
       item('うんち', '形とスッキリしたか（2タップ）', () => openStool(null), 'primary'),
       item('1日の記録', '1日1回・約30秒', () => openDaily()),
       item('食事', '任意。確かめたい時期だけ', () => openMeal(null)),
-      item('症状', '任意。いま強いときに', () => openSymptom(null)),
+      item('症状', '任意。腹痛・張り・胃もたれが強いときに', () => openSymptom(null)),
       item('週次評価', '日曜の夜に。1〜2分', () => openWeekly())),
   });
 }
