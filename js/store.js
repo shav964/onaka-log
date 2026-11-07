@@ -1,7 +1,7 @@
 // メモリ上の状態と保存処理。変更があったら bus に change を流す
 
 import { getAll, put, del, getMeta, setMeta } from './db.js';
-import { DEFAULT_INTAKE, DEFAULT_DISHES } from './config.js';
+import { DEFAULT_INTAKE, DEFAULT_DISHES, ADDED_INTAKE, INTAKE_VERSION } from './config.js';
 import { ymd } from './util.js';
 
 export const state = { entries: [], dishes: [], foods: [], intake: [], meds: [], lastBackup: null };
@@ -13,6 +13,16 @@ export async function load() {
     await setMeta('intake', DEFAULT_INTAKE);
     for (const d of DEFAULT_DISHES) await put('dishes', { ...d, count: 0 });
     await setMeta('seeded', true);
+    await setMeta('intakeVersion', INTAKE_VERSION);
+  }
+  const ver = await getMeta('intakeVersion', 1);
+  if (ver < INTAKE_VERSION) {
+    const list = await getMeta('intake', DEFAULT_INTAKE);
+    for (const a of ADDED_INTAKE) {
+      if (a.since > ver && !list.some((x) => x.id === a.id)) list.push(DEFAULT_INTAKE.find((x) => x.id === a.id));
+    }
+    await setMeta('intake', list);
+    await setMeta('intakeVersion', INTAKE_VERSION);
   }
   [state.entries, state.dishes, state.foods] = await Promise.all([
     getAll('entries'), getAll('dishes'), getAll('foods'),

@@ -24,6 +24,7 @@ export const DEFAULT_INTAKE = [
   { id: 'mushroom', name: 'きのこ', group: 'depends' },
   { id: 'ferment', name: '発酵食品', group: 'depends' },
   { id: 'spicy', name: '辛いもの', group: 'depends' },
+  { id: 'sweets', name: 'お菓子', group: 'depends' },
   { id: 'alcohol', name: 'アルコール', group: 'worse' },
   { id: 'fried', name: '揚げ物', group: 'worse' },
   { id: 'fatty', name: '脂っこいもの', group: 'worse' },
@@ -33,6 +34,12 @@ export const DEFAULT_INTAKE = [
   { id: 'smallmeal', name: '食べる量が少なかった', group: 'other' },
   { id: 'exercise', name: '20分以上運動した', group: 'other' },
 ];
+
+// あとから増やした初期項目。すでに使っている人のチェック項目にも1回だけ足す
+export const ADDED_INTAKE = [
+  { since: 2, id: 'sweets' },
+];
+export const INTAKE_VERSION = 2;
 
 export const DEFAULT_DISHES = [
   { id: 'd_katsudon', name: 'カツ丼', items: ['rice', 'meat', 'egg', 'wheat', 'fried', 'onion'] },

@@ -1,5 +1,5 @@
 // オフライン用のキャッシュ。ファイルを変えたら VERSION を上げる
-const VERSION = 'harakiroku-v2';
+const VERSION = 'harakiroku-v3';
 const ASSETS = [
   './',
   'index.html',
