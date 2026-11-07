@@ -47,7 +47,20 @@ export const DEFAULT_DISHES = [
   { id: 'd_ramen', name: 'ラーメン', items: ['wheat', 'fatty', 'onion'] },
   { id: 'd_curry', name: 'カレーライス', items: ['rice', 'meat', 'onion', 'fatty'] },
   { id: 'd_yakizakana', name: '焼き魚定食', items: ['rice', 'fish'] },
+  // お菓子は種類ごとに料理として登録し、成分のチェックをまとめて入れる
+  { id: 'd_gummy', name: 'グミ', items: ['sweets'] },
+  { id: 'd_icecream', name: 'アイス', items: ['sweets', 'dairy', 'fatty'] },
+  { id: 'd_snack', name: 'スナック菓子', items: ['sweets', 'fried'] },
+  { id: 'd_wagashi', name: '和菓子', items: ['sweets', 'beans'] },
+  { id: 'd_cookie', name: 'クッキー系', items: ['sweets', 'wheat', 'fatty'] },
+  { id: 'd_choco', name: 'チョコ', items: ['sweets', 'dairy', 'fatty'] },
 ];
+
+// あとから増やした料理。すでに使っている人にも1回だけ足す
+export const ADDED_DISHES = [
+  { since: 2, ids: ['d_gummy', 'd_icecream', 'd_snack', 'd_wagashi', 'd_cookie', 'd_choco'] },
+];
+export const DISH_VERSION = 2;
 
 // 0〜10 の基準文（腹痛・張り・ストレス・疲労・気分で共通）
 export function severityText(v) {

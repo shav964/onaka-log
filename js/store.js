@@ -1,7 +1,9 @@
 // メモリ上の状態と保存処理。変更があったら bus に change を流す
 
 import { getAll, put, del, getMeta, setMeta } from './db.js';
-import { DEFAULT_INTAKE, DEFAULT_DISHES, ADDED_INTAKE, INTAKE_VERSION } from './config.js';
+import {
+  DEFAULT_INTAKE, DEFAULT_DISHES, ADDED_INTAKE, INTAKE_VERSION, ADDED_DISHES, DISH_VERSION,
+} from './config.js';
 import { ymd } from './util.js';
 
 export const state = { entries: [], dishes: [], foods: [], intake: [], meds: [], lastBackup: null };
@@ -14,6 +16,19 @@ export async function load() {
     for (const d of DEFAULT_DISHES) await put('dishes', { ...d, count: 0 });
     await setMeta('seeded', true);
     await setMeta('intakeVersion', INTAKE_VERSION);
+    await setMeta('dishVersion', DISH_VERSION);
+  }
+  const dver = await getMeta('dishVersion', 1);
+  if (dver < DISH_VERSION) {
+    const have = await getAll('dishes');
+    for (const a of ADDED_DISHES) {
+      if (a.since <= dver) continue;
+      for (const id of a.ids) {
+        const d = DEFAULT_DISHES.find((x) => x.id === id);
+        if (!have.some((x) => x.id === id || x.name === d.name)) await put('dishes', { ...d, count: 0 });
+      }
+    }
+    await setMeta('dishVersion', DISH_VERSION);
   }
   const ver = await getMeta('intakeVersion', 1);
   if (ver < INTAKE_VERSION) {
