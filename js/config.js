@@ -27,11 +27,13 @@ export const DEFAULT_INTAKE = [
   { id: 'fiber', name: '水溶性食物繊維', group: 'gentle' },
   // 木綿豆腐は水分を絞るときに豆のオリゴ糖が抜けるので低FODMAP
   { id: 'momen', name: '木綿豆腐', group: 'gentle' },
+  { id: 'lowfruit', name: '低FODMAP果物（ベリー・キウイ・みかん等）', group: 'gentle' },
+  { id: 'lowveg', name: '低FODMAP野菜（にんじん・トマト・ほうれん草等）', group: 'gentle' },
   { id: 'wheat', name: '小麦（パン・麺）', group: 'depends', fodmap: ['fructan'] },
   { id: 'dairy', name: '牛乳・ヨーグルト', group: 'depends', fodmap: ['lactose'] },
   { id: 'onion', name: '玉ねぎ・ニンニク', group: 'depends', fodmap: ['fructan'] },
   { id: 'beans', name: '豆類・絹ごし・豆乳', group: 'depends', fodmap: ['gos', 'fructan'] },
-  { id: 'fruit', name: '果物多め', group: 'depends', fodmap: ['fructose', 'polyol'] },
+  { id: 'fruit', name: '果物（りんご・桃・梨等）', group: 'depends', fodmap: ['fructose', 'polyol'] },
   { id: 'mushroom', name: 'きのこ', group: 'depends', fodmap: ['polyol'] },
   { id: 'fodveg', name: 'アスパラ・ごぼう等', group: 'depends', fodmap: ['fructan', 'polyol'] },
   { id: 'honeyjuice', name: 'はちみつ・ジュース', group: 'depends', fodmap: ['fructose'] },
@@ -54,12 +56,15 @@ export const ADDED_INTAKE = [
   { since: 3, id: 'fodveg' },
   { since: 3, id: 'honeyjuice' },
   { since: 4, id: 'momen' },
+  { since: 5, id: 'lowfruit' },
+  { since: 5, id: 'lowveg' },
 ];
-export const INTAKE_VERSION = 4;
+export const INTAKE_VERSION = 5;
 
 // 初期の名前のままなら新しい名前に変える（自分で変えた名前は触らない）
 export const RENAMED_INTAKE = [
   { since: 4, id: 'beans', from: '豆類' },
+  { since: 5, id: 'fruit', from: '果物多め' },
 ];
 
 export const DEFAULT_DISHES = [
