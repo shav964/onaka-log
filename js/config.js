@@ -80,13 +80,16 @@ export const DEFAULT_DISHES = [
   { id: 'd_wagashi', name: '和菓子', items: ['sweets', 'beans'] },
   { id: 'd_cookie', name: 'クッキー系', items: ['sweets', 'wheat', 'fatty'] },
   { id: 'd_choco', name: 'チョコ', items: ['sweets', 'dairy', 'fatty'] },
+  // 小麦粉・牛乳・卵で作る。はちみつをかけた日は「はちみつ・ジュース」を足す
+  { id: 'd_hotcake', name: 'ホットケーキ', items: ['wheat', 'dairy', 'egg', 'sweets'] },
 ];
 
 // あとから増やした料理。すでに使っている人にも1回だけ足す
 export const ADDED_DISHES = [
   { since: 2, ids: ['d_gummy', 'd_icecream', 'd_snack', 'd_wagashi', 'd_cookie', 'd_choco'] },
+  { since: 3, ids: ['d_hotcake'] },
 ];
-export const DISH_VERSION = 2;
+export const DISH_VERSION = 3;
 
 // 0〜10 の基準文（腹痛・張り・ストレス・疲労・気分で共通）
 export function severityText(v) {
