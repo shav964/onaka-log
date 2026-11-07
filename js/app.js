@@ -13,8 +13,9 @@ import {
   openStool, openDaily, openWeekly, openPlusMenu, openEntry, showRedFlag,
 } from './sheets.js';
 import { renderSettings, applyTheme, THEME_KEY } from './settings.js';
+import { renderCalendar, thisMonth } from './review.js';
 
-const ui = { tab: 'today', viewDate: today() };
+const ui = { tab: 'today', viewDate: today(), month: thisMonth() };
 const main = document.getElementById('main');
 const header = document.getElementById('header');
 const actionbar = document.getElementById('actionbar');
@@ -33,6 +34,7 @@ function renderTabs() {
       if (id === 'plus') { openPlusMenu(); return; }
       ui.tab = id;
       if (id === 'today') ui.viewDate = today();
+      if (id === 'review') ui.month = thisMonth();
       render();
       window.scrollTo(0, 0);
     },
@@ -207,7 +209,13 @@ function render() {
   actionbar.hidden = true;
   document.body.classList.toggle('has-actionbar', ui.tab === 'today');
   if (ui.tab === 'today') renderToday();
-  else if (ui.tab === 'review') renderPlaceholder('振り返り', '週ごとの指標、カレンダー、便通パターン、食品と症状の分析は、次のステップで追加します。いまは記録をためておきましょう（最初の2週間がベースラインになります）。');
+  else if (ui.tab === 'review') {
+    renderHeader(h('span', { class: 'head-date' }, '振り返り'), 'カレンダー');
+    main.replaceChildren(renderCalendar(ui.month, {
+      onPick: (date) => { ui.tab = 'today'; ui.viewDate = date; render(); window.scrollTo(0, 0); },
+      onMonth: (ym) => { ui.month = ym; render(); },
+    }));
+  }
   else if (ui.tab === 'report') renderPlaceholder('レポート', '受診用のまとめ（印刷・PDF保存）は、次のステップで追加します。');
   else if (ui.tab === 'settings') {
     renderHeader(h('span', { class: 'head-date' }, '設定'), '腹記録');
@@ -237,7 +245,15 @@ async function start() {
     render();
   });
   if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) {
+    // 新しい版が入ったら自動で読み込み直す（初回のインストール時は除く）
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!document.querySelector('.sheet-wrap')) location.reload();
+      });
+    }
+    navigator.serviceWorker.register('sw.js').then((reg) => reg.update()).catch(() => {});
+  }
 }
 
 window.addEventListener('error', (e) => toast('エラー：' + e.message));

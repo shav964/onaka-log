@@ -624,6 +624,60 @@ details.more > .field { border: none; border-top: 1px solid var(--line-2); paddi
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* カレンダー */
+.cal { padding: 8px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+.cal-head { margin-bottom: 3px; }
+.cal-wd { text-align: center; font-size: 12px; font-weight: 700; color: var(--muted); }
+.cal-wd.sun { color: var(--bad); }
+.cal-wd.sat { color: var(--link); }
+.cal-cell {
+  position: relative;
+  min-height: 54px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
+  background: var(--panel-2);
+  padding: 2px 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+}
+.cal-cell.blank { border: none; background: none; }
+.cal-cell.st-future { opacity: .35; }
+.cal-cell.today { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cal-day { font-size: 13px; font-weight: 700; }
+.cal-flag {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--bad);
+  width: 14px;
+  line-height: 14px;
+  text-align: center;
+}
+.cal-dots { display: flex; flex-wrap: wrap; gap: 2px; min-height: 7px; }
+.cal-dots i, .legend .dot { display: inline-block; width: 7px; height: 7px; border: 1px solid rgba(0, 0, 0, .3); }
+.k-normal { background: #4a8a4a; }
+.k-hard { background: #a8761a; }
+.k-loose { background: #b8443c; }
+
+/* 状態の色。セルは地の色、凡例は四角 */
+.st-good { background: #2f5a2f; border-color: #3c7a3c; color: #fff; }
+.st-normal { background: var(--panel-2); }
+.st-mild { background: #6a5320; border-color: #8a6c28; color: #fff; }
+.st-bad { background: #7a2e29; border-color: #9a3a33; color: #fff; }
+.st-none { background: transparent; border-style: dashed; color: var(--muted); }
+.cal-cell.st-good .cal-dots i, .cal-cell.st-mild .cal-dots i, .cal-cell.st-bad .cal-dots i { border-color: rgba(255, 255, 255, .6); }
+
+.legends { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 8px; font-size: 12px; color: var(--muted); }
+.legend { display: inline-flex; align-items: center; gap: 4px; }
+.legend .sw { display: inline-block; width: 12px; height: 12px; border: 1px solid var(--line); }
+.stats.spread { justify-content: space-between; }
+
 @media (max-width: 380px) {
   .stats { gap: 10px; }
   .stat-num { font-size: 19px; }
