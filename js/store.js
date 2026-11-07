@@ -114,5 +114,8 @@ export function prevDaily(date) {
 export const stoolsOn = (date) =>
   state.entries.filter((e) => e.type === 'stool' && ymd(new Date(e.at)) === date);
 
+export const mealsOn = (date) =>
+  state.entries.filter((e) => e.type === 'meal' && ymd(new Date(e.at)) === date);
+
 export const dailiesBetween = (from, to) =>
   state.entries.filter((e) => e.type === 'daily' && e.data.date >= from && e.data.date <= to);

@@ -628,6 +628,13 @@ details.more > .field { border: none; border-top: 1px solid var(--line-2); paddi
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* 料理の選択 */
+.dish-picker { display: flex; flex-direction: column; gap: 6px; }
+.dish-search { min-height: 38px; padding: 6px 10px; }
+.dish-search[hidden], .dish-more .btn[hidden] { display: none; }
+.dish-more { display: flex; justify-content: flex-end; }
+.dish-more:empty { display: none; }
+
 /* 高FODMAP のしるし */
 .fod {
   display: inline-block;

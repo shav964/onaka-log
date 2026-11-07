@@ -3,7 +3,7 @@
 import { h, openSheet, toast, seg, scale, field, dialog, confirmDialog } from './ui.js';
 import {
   state, bus, saveEntry, removeEntry, saveDish, saveFood, byCount,
-  dailyFor, prevDaily, stoolsOn, weeklyFor, dailiesBetween, groupOf, isFodmap, intakeName,
+  dailyFor, prevDaily, stoolsOn, mealsOn, weeklyFor, dailiesBetween, groupOf, isFodmap, intakeName,
 } from './store.js';
 import {
   BRISTOL, STOOL_DETAIL, RED_FLAG_COLORS, GROUPS, GAS_FREQ, GAS_SMELL, SLEEP,
@@ -179,7 +179,7 @@ export function openDaily(dateArg) {
   const dates = editableDailyDates();
   let date = dates.includes(dateArg) ? dateArg : defaultDailyDate();
   if (!dates.includes(date)) date = dates[dates.length - 1];
-  let d, existing, prev, saving = false;
+  let d, existing, prev, mergedMeals = 0, saving = false;
 
   function init() {
     existing = dailyFor(date);
@@ -197,6 +197,14 @@ export function openDaily(dateArg) {
       }
     }
     d.date = date;
+    // その日の食事の記録のうち、まだ反映していないもののタグと料理をチェックに足す
+    const merged = new Set(d.mealsMerged || []);
+    const fresh = mealsOn(date).filter((m) => !merged.has(m.id));
+    mergedMeals = fresh.length;
+    for (const m of fresh) {
+      d.intake = [...new Set([...d.intake, ...(m.data.tags || []).filter((id) => state.intake.some((x) => x.id === id))])];
+      d.dishes = [...new Set([...d.dishes, ...(m.data.dishes || []).filter((id) => state.dishes.some((x) => x.id === id))])];
+    }
   }
 
   const onChange = () => renderStoolBox();
@@ -244,6 +252,7 @@ export function openDaily(dateArg) {
         h('div', { class: 'daybar-sub' }, `締め切り ${fmtDateTime(dl)}　症状は「この日いちばん強かったとき」、睡眠は「この日の朝までの睡眠」`)),
       existing ? h('div', { class: 'note' }, '入力済みの記録を修正しています。')
         : prev ? h('div', { class: 'note' }, '前回の値が入っています。変わらない項目はそのまま保存でOK。') : null,
+      mergedMeals ? h('div', { class: 'note' }, `食事の記録（${mergedMeals}件）のタグと料理を「今日とったもの」に入れました。`) : null,
       field('腹痛（いちばん強かったとき）', scale(() => d.painMax, (v) => { d.painMax = v; }, severityText), { key: 'painMax', req: true }),
       field('張り・膨満感（いちばん強かったとき）', scale(() => d.bloatingMax, (v) => { d.bloatingMax = v; }, severityText), { key: 'bloatingMax', req: true }),
       field('胃もたれ（いちばん強かったとき）', scale(() => d.heavinessMax, (v) => { d.heavinessMax = v; }, severityText), { key: 'heavinessMax', req: true }),
@@ -282,7 +291,7 @@ export function openDaily(dateArg) {
       if (dish && !before.includes(id)) await saveDish({ ...dish, count: (dish.count || 0) + 1 });
     }
     const note = (d.note || '').trim();
-    const data = { ...d, recordedAt: new Date().toISOString() };
+    const data = { ...d, mealsMerged: mealsOn(date).map((m) => m.id), recordedAt: new Date().toISOString() };
     delete data.note;
     await saveEntry({ id: 'daily-' + date, type: 'daily', at: data.recordedAt, data, note });
     sheet.close();
@@ -297,6 +306,51 @@ export const fodBadge = () => h('span', { class: 'fod', title: '高FODMAP' }, 'F
 
 // チェック項目の表示名（高FODMAPには F を付ける）
 export const intakeLabel = (it) => [it.name, it.fodmap?.length ? fodBadge() : null];
+
+// カタカナをひらがなにそろえて検索する（「ほっと」で「ホットケーキ」が見つかる）
+const kana = (s) => s.toLowerCase().replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+
+// 料理（や、よく食べるもの）の選択。よく使う順に上位だけ出し、残りは「すべて表示」か検索で探す
+const DISH_LIMIT = 8;
+function dishPicker(isOn, onToggle, {
+  list: getList = () => state.dishes, placeholder = '料理を検索', empty = '料理は設定で登録できます', cls = 'dish',
+} = {}) {
+  let expanded = false;
+  let q = '';
+  const list = h('div', { class: 'chips' });
+  const more = h('button', { type: 'button', class: 'btn small', onclick: () => { expanded = !expanded; render(); } });
+  const search = h('input', {
+    type: 'search', class: 'input dish-search', placeholder, enterkeyhint: 'search',
+    oninput: (e) => { q = kana(e.target.value.trim()); render(); },
+  });
+  function render() {
+    const all = [...getList()].sort(byCount);
+    search.hidden = all.length <= DISH_LIMIT;
+    let shown;
+    if (q) shown = all.filter((x) => kana(x.name).includes(q));
+    else if (expanded || all.length <= DISH_LIMIT) shown = all;
+    else {
+      // 上位に入っていなくても、選んでいる料理は出しておく
+      const top = all.slice(0, DISH_LIMIT);
+      shown = [...top, ...all.filter((x) => isOn(x.id) && !top.includes(x))];
+    }
+    list.replaceChildren(...(shown.length
+      ? shown.map((dish) => h('button', {
+        type: 'button', class: `chip ${cls}` + (isOn(dish.id) ? ' on' : ''),
+        onclick: () => { onToggle(dish); render(); },
+      }, dish.name))
+      : [h('span', { class: 'muted small' }, all.length ? '見つかりません' : empty)]));
+    more.hidden = !!q || all.length <= DISH_LIMIT;
+    more.textContent = expanded ? '少なく表示' : `すべて表示（${all.length}）`;
+  }
+  render();
+  const box = h('div', { class: 'dish-picker' },
+    search,
+    list,
+    h('div', { class: 'dish-more' }, more));
+  box.render = render;
+  return box;
+}
 
 // 今日とったものチェック（料理・グループ別チェック・飲み物）
 function intakeUI(d, getPrev) {
@@ -325,12 +379,7 @@ function intakeUI(d, getPrev) {
     markAll();
   };
 
-  const dishes = [...state.dishes].sort(byCount);
-  const dishRow = dishes.length ? h('div', { class: 'chips' }, dishes.map((dish) => {
-    const el = h('button', { type: 'button', class: 'chip dish', onclick: () => toggleDish(dish) }, dish.name);
-    chips.push({ el, test: () => d.dishes.includes(dish.id) });
-    return el;
-  })) : null;
+  const picker = dishPicker((id) => d.dishes.includes(id), toggleDish);
 
   const groups = GROUPS.map((g) => {
     const items = state.intake.filter((x) => x.group === g.id);
@@ -354,7 +403,7 @@ function intakeUI(d, getPrev) {
       d.intake = [...(p.data.intake || [])];
       d.dishes = [...(p.data.dishes || [])];
       d.coffeeCups = p.data.coffeeCups ?? 0;
-      markAll(); coffee.mark();
+      markAll(); coffee.mark(); picker.render();
       toast('前回と同じ内容にしました');
     },
   }, '前回と同じ');
@@ -362,7 +411,7 @@ function intakeUI(d, getPrev) {
   markAll();
   return h('div', null,
     h('div', { class: 'row-between sub-head' }, h('span', { class: 'muted small' }, '料理（タップでまとめてチェック）'), sameBtn),
-    dishRow || h('div', { class: 'muted small' }, '料理は設定で登録できます'),
+    picker,
     groups,
     fodLine,
     h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'コーヒー'), coffee));
@@ -451,18 +500,39 @@ export function openWeekly(sunArg) {
 
 export function openMeal(existing) {
   const d = existing ? clone(existing.data) : { items: [], tags: [], amount: 'normal' };
+  d.dishes = d.dishes || [];
   let at = existing ? existing.at : new Date().toISOString();
   let saving = false;
-  const chips = [];
-  const markAll = () => chips.forEach(({ el, test }) => el.classList.toggle('on', test()));
+  const tagChips = [];
+  const markAll = () => tagChips.forEach(({ el, test }) => el.classList.toggle('on', test()));
+  const refresh = () => { renderSelected(); markAll(); dishBox.render(); foodBox.render(); };
 
   const selected = h('div', { class: 'chips' });
   function renderSelected() {
     selected.replaceChildren(...(d.items.length ? d.items.map((name) => h('button', {
       type: 'button', class: 'chip on',
-      onclick: () => { d.items = d.items.filter((x) => x !== name); renderSelected(); markAll(); },
+      onclick: () => {
+        const dish = state.dishes.find((x) => x.name === name && d.dishes.includes(x.id));
+        if (dish) toggleDish(dish);
+        else { d.items = d.items.filter((x) => x !== name); refresh(); }
+      },
     }, name, ' ×')) : [h('span', { class: 'muted small' }, 'まだ選んでいません')]));
   }
+
+  // 料理：名前を「食べたもの」に入れ、ひもづく食材をタグにまとめて付ける
+  const toggleDish = (dish) => {
+    if (d.dishes.includes(dish.id)) {
+      d.dishes = d.dishes.filter((x) => x !== dish.id);
+      d.items = d.items.filter((x) => x !== dish.name);
+      const keep = new Set(d.dishes.flatMap((id) => state.dishes.find((x) => x.id === id)?.items || []));
+      d.tags = d.tags.filter((id) => !dish.items.includes(id) || keep.has(id));
+    } else {
+      d.dishes = [...d.dishes, dish.id];
+      if (!d.items.includes(dish.name)) d.items = [...d.items, dish.name];
+      d.tags = [...new Set([...d.tags, ...dish.items])];
+    }
+    refresh();
+  };
 
   const toggleFood = (f) => {
     if (d.items.includes(f.name)) d.items = d.items.filter((x) => x !== f.name);
@@ -470,20 +540,13 @@ export function openMeal(existing) {
       d.items = [...d.items, f.name];
       d.tags = [...new Set([...d.tags, ...(f.tags || [])])];
     }
-    renderSelected(); markAll();
+    refresh();
   };
 
-  const foodRow = h('div', { class: 'chips' });
-  function renderFoods() {
-    chips.splice(0, chips.length);
-    foodRow.replaceChildren(...[...state.foods].sort(byCount).map((f) => {
-      const el = h('button', { type: 'button', class: 'chip', onclick: () => toggleFood(f) }, f.name);
-      chips.push({ el, test: () => d.items.includes(f.name) });
-      return el;
-    }));
-    tagChips.forEach((c) => chips.push(c));
-    markAll();
-  }
+  const dishBox = dishPicker((id) => d.dishes.includes(id), toggleDish);
+  const foodBox = dishPicker((id) => d.items.includes(state.foods.find((x) => x.id === id)?.name), toggleFood, {
+    list: () => state.foods, placeholder: '食べものを検索', empty: '下の欄から追加できます', cls: '',
+  });
 
   const input = h('input', { type: 'text', class: 'input', placeholder: '新しい食べもの', enterkeyhint: 'done' });
   const addNew = async () => {
@@ -493,10 +556,9 @@ export function openMeal(existing) {
     let f = state.foods.find((x) => x.name === name);
     if (!f) { f = { id: uid(), name, tags: [], count: 0 }; await saveFood(f); }
     if (!d.items.includes(name)) d.items = [...d.items, name];
-    renderFoods(); renderSelected();
+    refresh();
   };
 
-  const tagChips = [];
   const groups = GROUPS.map((g) => {
     const items = state.intake.filter((x) => x.group === g.id);
     if (!items.length) return null;
@@ -517,14 +579,15 @@ export function openMeal(existing) {
     body: [
       h('div', { class: 'note' }, '特定の食べものを確かめたい時期だけ使えばOK。ふだんは「1日の記録」のチェックで十分です。'),
       timeField(() => at, (v) => { at = v; }),
-      field('よく食べるもの', [foodRow, h('div', { class: 'row-gap' }, input, h('button', { type: 'button', class: 'btn', onclick: addNew }, '追加'))]),
+      field('料理（タップでタグもまとめて付く）', dishBox),
+      field('よく食べるもの', [foodBox, h('div', { class: 'row-gap' }, input, h('button', { type: 'button', class: 'btn', onclick: addNew }, '追加'))]),
       field('食べたもの', selected),
       field('タグ', groups),
       field('量', seg([['small', '少なめ'], ['normal', '普通'], ['large', '多め']], () => d.amount, (v) => { d.amount = v; })),
     ],
     foot: footButtons(save, deleter(existing, { close: () => sheet.close() }, '食事')),
   });
-  renderFoods(); renderSelected();
+  refresh();
 
   async function save() {
     if (saving) return;
@@ -535,6 +598,11 @@ export function openMeal(existing) {
     for (const name of d.items) {
       const f = state.foods.find((x) => x.name === name);
       if (f && !before.includes(name)) await saveFood({ ...f, count: (f.count || 0) + 1 });
+    }
+    const beforeDishes = existing?.data.dishes || [];
+    for (const id of d.dishes) {
+      const dish = state.dishes.find((x) => x.id === id);
+      if (dish && !beforeDishes.includes(id)) await saveDish({ ...dish, count: (dish.count || 0) + 1 });
     }
     await saveEntry({ id: existing?.id || uid(), type: 'meal', at, data: d, note: existing?.note || '' });
     sheet.close();
