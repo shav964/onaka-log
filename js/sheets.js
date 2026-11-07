@@ -124,7 +124,7 @@ export function openStool(existing, { presetDate } = {}) {
   }, detailOpen ? '詳しく記録を閉じる' : '詳しく記録（任意）');
 
   const redBtn = h('button', {
-    type: 'button', class: 'btn danger-outline block',
+    type: 'button', class: 'btn small block subtle',
     onclick: () => showRedFlag((p) => {
       if (p.blood) d.blood = true;
       if (p.black) d.color = 'black';
@@ -132,7 +132,7 @@ export function openStool(existing, { presetDate } = {}) {
       detailOpen = true; detailBox.hidden = false; detailToggle.textContent = '詳しく記録を閉じる';
       detailSegs.forEach((s) => s.mark()); updWarn();
     }),
-  }, '血・黒い便・白っぽい便');
+  }, '色や血が気になったとき');
   updWarn();
 
   const sheet = openSheet({
@@ -141,9 +141,9 @@ export function openStool(existing, { presetDate } = {}) {
       isNew ? h('div', { class: 'note' }, '形と「スッキリした？」を選ぶと自動で保存します。') : null,
       field('便の形（ブリストル）', [h('div', { class: 'bristol-grid' }, bbtns), desc], { key: 'bristol', req: true }),
       field('スッキリした？', refreshed, { key: 'refreshed', req: true }),
-      redBtn, warn,
       timeField(() => at, (v) => { at = v; }),
       detailToggle, detailBox,
+      warn, redBtn,
     ],
     foot: footButtons(save, deleter(existing, { close: () => sheet.close() }, 'うんち')),
   });

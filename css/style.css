@@ -178,6 +178,7 @@ b { font-weight: 700; }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .btn.danger { background: var(--bad); border-color: var(--bad); color: #fff; }
 .btn.danger-outline { background: transparent; border-color: var(--bad); color: var(--bad); }
+.btn.subtle { background: transparent; border-color: var(--line-2); color: var(--muted); font-weight: 400; }
 .btn.attention { background: var(--banner); border-color: var(--banner-line); color: var(--banner-text); }
 .btn.big { min-height: 52px; font-size: 17px; }
 .grow { flex: 1; }
@@ -681,9 +682,9 @@ details.more > .field { border: none; border-top: 1px solid var(--line-2); paddi
 }
 .cal-dots { display: flex; flex-wrap: wrap; gap: 2px; min-height: 7px; }
 .cal-dots i, .legend .dot { display: inline-block; width: 7px; height: 7px; border: 1px solid rgba(0, 0, 0, .3); }
-.k-normal { background: #4a8a4a; }
-.k-hard { background: #a8761a; }
-.k-loose { background: #b8443c; }
+.cal-dots .k-normal, .legend .k-normal { background: #4a8a4a; }
+.cal-dots .k-hard, .legend .k-hard { background: #a8761a; }
+.cal-dots .k-loose, .legend .k-loose { background: #b8443c; }
 
 /* 状態の色。セルは地の色、凡例は四角 */
 .st-good { background: #2f5a2f; border-color: #3c7a3c; color: #fff; }

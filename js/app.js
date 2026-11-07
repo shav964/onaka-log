@@ -10,7 +10,7 @@ import {
   defaultDailyDate, dailyDeadline, weekStart, lastSunday,
 } from './util.js';
 import {
-  openStool, openDaily, openWeekly, openPlusMenu, openEntry, showRedFlag, fodBadge,
+  openStool, openDaily, openWeekly, openPlusMenu, openEntry, fodBadge,
 } from './sheets.js';
 import { renderSettings, applyTheme, THEME_KEY } from './settings.js';
 import { renderCalendar, thisMonth } from './review.js';
@@ -185,7 +185,6 @@ function renderToday() {
       h('span', { class: 'daynav-date' }, fmtDate(v)),
       h('button', { type: 'button', class: 'btn small', disabled: v >= t, onclick: () => { ui.viewDate = addDays(v, 1); render(); } }, '翌日 ▶')),
     v === t ? banners(t) : null,
-    h('button', { type: 'button', class: 'btn danger-outline block', onclick: () => showRedFlag(null) }, '血・黒い便・白っぽい便が出たとき'),
     daily ? dailyCard(daily) : null,
     cards.length ? cards : h('div', { class: 'empty' }, 'この日の記録はまだありません'),
   ));
