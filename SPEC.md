@@ -129,11 +129,13 @@ Nov 7, 2026 · @たき
 | 飲み物 | 記録のしかた |
 | --- | --- |
 | コーヒー | 0 ・ 1 ・ 2 ・ 3杯以上。前日の値が初期値 |
-| エナジードリンク | 0 ・ 1 ・ 2本以上。前日の値が初期値 |
+| エナジードリンク | 記録しない（本人の希望で画面から外した。2026-11-07） |
 | 水・麦茶 | 記録しない（毎日飲んでいて、お腹への刺激も少ないため） |
 | その他（緑茶・紅茶など） | 記録しない。飲むようになったら設定で追加する |
 
-分析では、杯数ごとにその日と翌日のお腹の状態を比べる。例：「エナジードリンク0本の日と1本以上の日で、翌日の軟便率はどう違うか」。
+分析では、杯数ごとにその日と翌日のお腹の状態を比べる。例：「コーヒー0〜1杯の日と2杯以上の日で、翌日の軟便率はどう違うか」。
+
+**豆腐**：木綿豆腐は低FODMAPとされるので「おなかにやさしい」の別項目にする。絹ごし豆腐と豆乳は「豆類・絹ごし・豆乳」（高FODMAP）にチェックする。
 
 **よく食べる料理の登録**：料理名と、その料理に含まれるチェック項目をセットで登録しておく。1日の記録で料理名をタップすると、登録した項目にまとめてチェックが入る。
 
@@ -271,7 +273,7 @@ IBSの重さを測る「IBS-SSS」という評価の構成を参考にした自�
 | meal | items: 食べたもののリスト / tags: 食品タグのリスト / amount: small・normal・large |
 | stool | bristol 1〜7（必須） / refreshed: はい・いいえ（必須） / 以下は任意： amount: small・normal・large / color / mucus: none・some・much / floating: none・floats・oily / undigested 有無 / smell: usual・strong / toiletTime: lt5・5to10・gt10 / urgency・straining・incomplete・blood 有無 / good: 良便判定（自動） |
 | symptom | pain・bloating・heaviness（胃もたれ） 0〜10（臨時記録・任意。どれか1つ以上） |
-| daily | painMax・bloatingMax・heavinessMax（胃もたれ） 0〜10 / stress 0〜10 / sleepHours: lt5・5to6・6to7・7to8・gt8 / intake: 今日とったものチェックのリスト / coffeeCups 0〜3 / energyDrinks 0〜2 / gasFreq 0〜4 / gasSmell 0〜3 / fatigue・mood・sleepQuality 0〜10（任意） / meds: 飲んだもののリスト / noStool: 排便なし確認 / date: どの日の記録か（自動判定） / recordedAt: 実際に入力した日時 |
+| daily | painMax・bloatingMax・heavinessMax（胃もたれ） 0〜10 / stress 0〜10 / sleepHours: lt5・5to6・6to7・7to8・gt8 / intake: 今日とったものチェックのリスト / coffeeCups 0〜3 / energyDrinks 0〜2（入力は廃止。過去の記録にだけ残る） / gasFreq 0〜4 / gasSmell 0〜3 / fatigue・mood・sleepQuality 0〜10（任意） / meds: 飲んだもののリスト / noStool: 排便なし確認 / date: どの日の記録か（自動判定） / recordedAt: 実際に入力した日時 |
 | weekly | painSeverity・bloatingSeverity・bowelDissatisfaction・lifeInterference 0〜100 / painDays10（自動） / total 0〜500 / adequateRelief はい・いいえ |
 
 **experiments（実験）**：名前、変えること、開始日、終了日、判定する指標、結果（改善・変化なし・悪化）。

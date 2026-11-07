@@ -109,7 +109,7 @@ function dailyCard(e) {
     h('div', { class: 'kv-grid' },
       kv('腹痛', d.painMax), kv('張り', d.bloatingMax), kv('胃もたれ', d.heavinessMax ?? '—'), kv('ストレス', d.stress),
       kv('おなら', `${d.gasFreq}/${d.gasSmell}`), kv('睡眠', SLEEP_LABEL[d.sleepHours]),
-      kv('コーヒー', d.coffeeCups ?? 0), kv('エナドリ', d.energyDrinks ?? 0), kv('排便', stoolsOn(d.date).length ? `${stoolsOn(d.date).length}回` : d.noStool ? 'なし' : '—')),
+      kv('コーヒー', d.coffeeCups ?? 0), kv('排便', stoolsOn(d.date).length ? `${stoolsOn(d.date).length}回` : d.noStool ? 'なし' : '—')),
     dishes.length ? h('div', { class: 'card-sub' }, '料理：' + dishes.join('、')) : null,
     h('div', { class: 'card-tags left' }, (d.intake || []).map(intakeTag)),
     (d.intake || []).some(isFodmap) ? h('div', { class: 'card-sub' }, fodBadge(), ` 高FODMAP ${(d.intake || []).filter(isFodmap).length}項目`) : null,

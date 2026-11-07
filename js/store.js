@@ -2,7 +2,7 @@
 
 import { getAll, put, del, getMeta, setMeta } from './db.js';
 import {
-  DEFAULT_INTAKE, DEFAULT_DISHES, ADDED_INTAKE, INTAKE_VERSION, ADDED_DISHES, DISH_VERSION,
+  DEFAULT_INTAKE, DEFAULT_DISHES, ADDED_INTAKE, RENAMED_INTAKE, INTAKE_VERSION, ADDED_DISHES, DISH_VERSION,
 } from './config.js';
 import { ymd } from './util.js';
 
@@ -35,6 +35,10 @@ export async function load() {
     const list = await getMeta('intake', DEFAULT_INTAKE);
     for (const a of ADDED_INTAKE) {
       if (a.since > ver && !list.some((x) => x.id === a.id)) list.push(DEFAULT_INTAKE.find((x) => x.id === a.id));
+    }
+    for (const r of RENAMED_INTAKE) {
+      const it = list.find((x) => x.id === r.id);
+      if (r.since > ver && it?.name === r.from) it.name = DEFAULT_INTAKE.find((x) => x.id === r.id).name;
     }
     // v3：既存の初期項目に高FODMAPのしるしを付ける（自分で付け外ししたものは触らない）
     if (ver < 3) {

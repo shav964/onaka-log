@@ -172,7 +172,7 @@ const REQ_DAILY = [
   ['gasSmell', 'おならのにおい'], ['stress', 'ストレス'], ['sleepHours', '睡眠時間'],
 ];
 const COPY_KEYS = ['painMax', 'bloatingMax', 'heavinessMax', 'gasFreq', 'gasSmell', 'stress', 'sleepHours',
-  'coffeeCups', 'energyDrinks', 'fatigue', 'mood', 'sleepQuality'];
+  'coffeeCups', 'fatigue', 'mood', 'sleepQuality'];
 const OPTIONAL_KEYS = ['fatigue', 'mood', 'sleepQuality'];
 
 export function openDaily(dateArg) {
@@ -188,7 +188,7 @@ export function openDaily(dateArg) {
       d = clone(existing.data);
       d.note = existing.note || '';
     } else {
-      d = { intake: [], dishes: [], meds: [], coffeeCups: 0, energyDrinks: 0, note: '' };
+      d = { intake: [], dishes: [], meds: [], coffeeCups: 0, note: '' };
       if (prev) {
         for (const k of COPY_KEYS) if (prev.data[k] != null) d[k] = prev.data[k];
         // 毎日食べる「おなかにやさしい」グループだけ前日の値を初期値にする
@@ -345,7 +345,6 @@ function intakeUI(d, getPrev) {
   });
 
   const coffee = seg([[0, '0'], [1, '1'], [2, '2'], [3, '3杯以上']], () => d.coffeeCups, (v) => { d.coffeeCups = v; });
-  const energy = seg([[0, '0'], [1, '1'], [2, '2本以上']], () => d.energyDrinks, (v) => { d.energyDrinks = v; });
 
   const sameBtn = h('button', {
     type: 'button', class: 'btn small',
@@ -355,8 +354,7 @@ function intakeUI(d, getPrev) {
       d.intake = [...(p.data.intake || [])];
       d.dishes = [...(p.data.dishes || [])];
       d.coffeeCups = p.data.coffeeCups ?? 0;
-      d.energyDrinks = p.data.energyDrinks ?? 0;
-      markAll(); coffee.mark(); energy.mark();
+      markAll(); coffee.mark();
       toast('前回と同じ内容にしました');
     },
   }, '前回と同じ');
@@ -367,8 +365,7 @@ function intakeUI(d, getPrev) {
     dishRow || h('div', { class: 'muted small' }, '料理は設定で登録できます'),
     groups,
     fodLine,
-    h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'コーヒー'), coffee),
-    h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'エナドリ'), energy));
+    h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'コーヒー'), coffee));
 }
 
 function medsUI(d) {
