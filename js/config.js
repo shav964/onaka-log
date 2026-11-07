@@ -10,25 +10,36 @@ export const GROUPS = [
   { id: 'other', name: 'その他' },
 ];
 
+// FODMAP の種類（高FODMAPの食材に付けるしるし）
+export const FODMAP_TYPES = {
+  fructan: 'フルクタン',
+  gos: 'ガラクトオリゴ糖',
+  lactose: '乳糖',
+  fructose: '果糖',
+  polyol: 'ポリオール',
+};
+
 export const DEFAULT_INTAKE = [
   { id: 'rice', name: 'ご飯', group: 'gentle' },
   { id: 'meat', name: '肉', group: 'gentle' },
   { id: 'fish', name: '魚', group: 'gentle' },
   { id: 'egg', name: '卵', group: 'gentle' },
   { id: 'fiber', name: '水溶性食物繊維', group: 'gentle' },
-  { id: 'wheat', name: '小麦（パン・麺）', group: 'depends' },
-  { id: 'dairy', name: '牛乳・ヨーグルト', group: 'depends' },
-  { id: 'onion', name: '玉ねぎ・ニンニク', group: 'depends' },
-  { id: 'beans', name: '豆類', group: 'depends' },
-  { id: 'fruit', name: '果物多め', group: 'depends' },
-  { id: 'mushroom', name: 'きのこ', group: 'depends' },
+  { id: 'wheat', name: '小麦（パン・麺）', group: 'depends', fodmap: ['fructan'] },
+  { id: 'dairy', name: '牛乳・ヨーグルト', group: 'depends', fodmap: ['lactose'] },
+  { id: 'onion', name: '玉ねぎ・ニンニク', group: 'depends', fodmap: ['fructan'] },
+  { id: 'beans', name: '豆類', group: 'depends', fodmap: ['gos', 'fructan'] },
+  { id: 'fruit', name: '果物多め', group: 'depends', fodmap: ['fructose', 'polyol'] },
+  { id: 'mushroom', name: 'きのこ', group: 'depends', fodmap: ['polyol'] },
+  { id: 'fodveg', name: 'アスパラ・ごぼう等', group: 'depends', fodmap: ['fructan', 'polyol'] },
+  { id: 'honeyjuice', name: 'はちみつ・ジュース', group: 'depends', fodmap: ['fructose'] },
   { id: 'ferment', name: '発酵食品', group: 'depends' },
   { id: 'spicy', name: '辛いもの', group: 'depends' },
   { id: 'sweets', name: 'お菓子', group: 'depends' },
   { id: 'alcohol', name: 'アルコール', group: 'worse' },
   { id: 'fried', name: '揚げ物', group: 'worse' },
   { id: 'fatty', name: '脂っこいもの', group: 'worse' },
-  { id: 'sweetener', name: '人工甘味料', group: 'worse' },
+  { id: 'sweetener', name: '人工甘味料', group: 'worse', fodmap: ['polyol'] },
   { id: 'soda', name: '炭酸', group: 'worse' },
   { id: 'overeat', name: '食べすぎ', group: 'worse' },
   { id: 'smallmeal', name: '食べる量が少なかった', group: 'other' },
@@ -38,8 +49,10 @@ export const DEFAULT_INTAKE = [
 // あとから増やした初期項目。すでに使っている人のチェック項目にも1回だけ足す
 export const ADDED_INTAKE = [
   { since: 2, id: 'sweets' },
+  { since: 3, id: 'fodveg' },
+  { since: 3, id: 'honeyjuice' },
 ];
-export const INTAKE_VERSION = 2;
+export const INTAKE_VERSION = 3;
 
 export const DEFAULT_DISHES = [
   { id: 'd_katsudon', name: 'カツ丼', items: ['rice', 'meat', 'egg', 'wheat', 'fried', 'onion'] },

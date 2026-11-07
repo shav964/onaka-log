@@ -3,7 +3,7 @@
 import { h, openSheet, toast, seg, scale, field, dialog, confirmDialog } from './ui.js';
 import {
   state, bus, saveEntry, removeEntry, saveDish, saveFood, byCount,
-  dailyFor, prevDaily, stoolsOn, weeklyFor, dailiesBetween, groupOf,
+  dailyFor, prevDaily, stoolsOn, weeklyFor, dailiesBetween, groupOf, isFodmap, intakeName,
 } from './store.js';
 import {
   BRISTOL, STOOL_DETAIL, RED_FLAG_COLORS, GROUPS, GAS_FREQ, GAS_SMELL, SLEEP,
@@ -293,10 +293,20 @@ export function openDaily(dateArg) {
   build();
 }
 
+export const fodBadge = () => h('span', { class: 'fod', title: '高FODMAP' }, 'F');
+
+// チェック項目の表示名（高FODMAPには F を付ける）
+export const intakeLabel = (it) => [it.name, it.fodmap?.length ? fodBadge() : null];
+
 // 今日とったものチェック（料理・グループ別チェック・飲み物）
 function intakeUI(d, getPrev) {
   const chips = [];
-  const markAll = () => chips.forEach(({ el, test }) => el.classList.toggle('on', test()));
+  const fodLine = h('div', { class: 'fod-line' });
+  const markAll = () => {
+    chips.forEach(({ el, test }) => el.classList.toggle('on', test()));
+    const fods = d.intake.filter(isFodmap);
+    fodLine.replaceChildren(fodBadge(), fods.length ? ` 高FODMAP ${fods.length}項目：${fods.map(intakeName).join('、')}` : ' 高FODMAPの食材：なし');
+  };
 
   const toggleItem = (id) => {
     d.intake = d.intake.includes(id) ? d.intake.filter((x) => x !== id) : [...d.intake, id];
@@ -328,7 +338,7 @@ function intakeUI(d, getPrev) {
     return h('div', { class: 'grp g-' + g.id },
       h('div', { class: 'grp-name' }, g.name),
       h('div', { class: 'chips' }, items.map((it) => {
-        const el = h('button', { type: 'button', class: 'chip', onclick: () => toggleItem(it.id) }, it.name);
+        const el = h('button', { type: 'button', class: 'chip', onclick: () => toggleItem(it.id) }, intakeLabel(it));
         chips.push({ el, test: () => d.intake.includes(it.id) });
         return el;
       })));
@@ -356,6 +366,7 @@ function intakeUI(d, getPrev) {
     h('div', { class: 'row-between sub-head' }, h('span', { class: 'muted small' }, '料理（タップでまとめてチェック）'), sameBtn),
     dishRow || h('div', { class: 'muted small' }, '料理は設定で登録できます'),
     groups,
+    fodLine,
     h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'コーヒー'), coffee),
     h('div', { class: 'drink' }, h('span', { class: 'drink-label' }, 'エナドリ'), energy));
 }
@@ -498,7 +509,7 @@ export function openMeal(existing) {
         const el = h('button', {
           type: 'button', class: 'chip',
           onclick: () => { d.tags = d.tags.includes(it.id) ? d.tags.filter((x) => x !== it.id) : [...d.tags, it.id]; markAll(); },
-        }, it.name);
+        }, intakeLabel(it));
         tagChips.push({ el, test: () => d.tags.includes(it.id) });
         return el;
       })));

@@ -571,7 +571,10 @@ details.more > .field { border: none; border-top: 1px solid var(--line-2); paddi
 .list-title { font-weight: 700; }
 .list-sub { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .list-meta { font-size: 12px; color: var(--muted); }
-.list-row .select { min-height: 36px; padding: 4px 6px; font-size: 14px; }
+.list-row .select { min-height: 36px; padding: 4px 4px; font-size: 13px; width: 7.6em; min-width: 0; flex: none; }
+.list-row.static { gap: 5px; padding: 6px 8px; }
+.list-row.static .btn.small { padding: 4px 8px; font-size: 13px; flex: none; }
+.list-row.static .fod-toggle { min-width: 34px; }
 .add-box { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--line-2); }
 .kv { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-2); font-size: 14px; }
 
@@ -623,6 +626,23 @@ details.more > .field { border: none; border-top: 1px solid var(--line-2); paddi
   transition: opacity .2s, transform .2s;
 }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* 高FODMAP のしるし */
+.fod {
+  display: inline-block;
+  margin-left: 3px;
+  padding: 0 3px;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 700;
+  vertical-align: 1px;
+  color: #fff;
+  background: #6d4fa0;
+  border-radius: 2px;
+}
+.fod-line { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.fod-toggle { min-width: 40px; color: var(--muted); }
+.fod-toggle.on { background: #6d4fa0; border-color: #6d4fa0; color: #fff; }
 
 /* カレンダー */
 .cal { padding: 8px; }

@@ -4,11 +4,20 @@ import { h, openSheet, toast, seg, field, confirmDialog } from './ui.js';
 import {
   state, saveDish, removeDish, saveFood, removeFood, setIntake, setMeds, byCount, intakeName,
 } from './store.js';
-import { GROUPS } from './config.js';
+import { GROUPS, FODMAP_TYPES } from './config.js';
+import { intakeLabel, fodBadge } from './sheets.js';
 import { uid, fmtDateTime } from './util.js';
 import { exportJSON, exportCSV, parseBackup, importJSON } from './backup.js';
 
 export const THEME_KEY = 'hk-theme';
+
+const FODMAP_DESC = {
+  fructan: '小麦、玉ねぎ、ニンニク、ごぼう、アスパラ',
+  gos: '大豆・あずき・ひよこ豆などの豆類',
+  lactose: '牛乳、ヨーグルト、アイス',
+  fructose: 'りんご、はちみつ、果糖ぶどう糖液糖入りのジュース',
+  polyol: 'きのこ、梨・桃、糖アルコール（キシリトールなど）',
+};
 
 export function applyTheme(v) {
   if (v === 'light' || v === 'dark') document.documentElement.dataset.theme = v;
@@ -42,7 +51,7 @@ function openSetEditor(kind, obj) {
             d[key] = d[key].includes(it.id) ? d[key].filter((x) => x !== it.id) : [...d[key], it.id];
             el.classList.toggle('on', d[key].includes(it.id));
           },
-        }, it.name);
+        }, intakeLabel(it));
         chips.push(el);
         return el;
       })));
@@ -90,7 +99,17 @@ function setList(list, kind, emptyText) {
 
 function intakeEditor() {
   const rows = state.intake.map((it) => h('div', { class: 'list-row static' },
-    h('div', { class: 'list-main' }, h('div', { class: 'list-title' }, it.name)),
+    h('div', { class: 'list-main' },
+      h('div', { class: 'list-title' }, it.name),
+      it.fodmap?.length ? h('div', { class: 'list-sub' }, it.fodmap.map((t) => FODMAP_TYPES[t]).filter(Boolean).join('・') || '高FODMAP') : null),
+    h('button', {
+      type: 'button', class: 'btn small fod-toggle' + (it.fodmap?.length ? ' on' : ''), 'aria-label': '高FODMAPのしるし',
+      onclick: async () => {
+        const fodmap = it.fodmap?.length ? [] : ['custom'];
+        await setIntake(state.intake.map((x) => (x.id === it.id ? { ...x, fodmap } : x)));
+        toast(fodmap.length ? `「${it.name}」を高FODMAPにしました` : `「${it.name}」の高FODMAPを外しました`);
+      },
+    }, 'F'),
     h('select', {
       class: 'input select g-' + it.group,
       onchange: async (e) => {
@@ -188,7 +207,15 @@ export function renderSettings() {
         applyTheme(v);
       }))),
     panel('よく食べる料理', h('div', { class: 'muted small' }, '1日の記録で料理名をタップすると、登録したチェックがまとめて入ります。'), setList(state.dishes, 'dish', 'まだ登録がありません')),
-    panel('チェック項目', h('div', { class: 'muted small' }, 'グループは一般論です。自分の記録で結果が違ったら、自分の結果を優先して変えてください。'), intakeEditor()),
+    panel('チェック項目',
+      h('div', { class: 'muted small' }, 'グループは一般論です。自分の記録で結果が違ったら、自分の結果を優先して変えてください。'),
+      h('div', { class: 'muted small' }, fodBadge(), ' は高FODMAPの食材。右の「F」ボタンで付け外しできます。'),
+      intakeEditor()),
+    panel('FODMAPについて',
+      h('div', { class: 'small' }, 'FODMAPは、小腸で吸収されにくく、大腸で発酵してガスや水分を増やしやすい糖のなかまです。IBSの人の多くで、張り・腹痛・下痢の原因になりやすいと言われています。'),
+      h('div', { class: 'kv-list small' }, Object.entries(FODMAP_DESC).map(([t, ex]) =>
+        h('div', { class: 'kv' }, h('b', null, FODMAP_TYPES[t]), h('span', { class: 'muted' }, ex)))),
+      h('div', { class: 'muted small' }, '合う・合わないは人によります。FODMAPを減らす食事（低FODMAP）は制限が大きいので、試すときは医師か管理栄養士と相談してから。')),
     panel('薬・サプリ', medsEditor()),
     panel('よく食べるもの（食事記録用）', setList(state.foods, 'food', '食事記録で入力すると、ここに増えていきます')),
     backupPanel(),

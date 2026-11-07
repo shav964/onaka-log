@@ -2,7 +2,7 @@
 
 import { h, toast } from './ui.js';
 import {
-  state, bus, load, dailyFor, weeklyFor, stoolsOn, dailiesBetween, intakeName, groupOf, medName,
+  state, bus, load, dailyFor, weeklyFor, stoolsOn, dailiesBetween, intakeName, groupOf, medName, isFodmap,
 } from './store.js';
 import { BRISTOL, SLEEP_LABEL, STOOL_DETAIL, RED_FLAG_COLORS, SYMPTOMS } from './config.js';
 import {
@@ -10,7 +10,7 @@ import {
   defaultDailyDate, dailyDeadline, weekStart, lastSunday,
 } from './util.js';
 import {
-  openStool, openDaily, openWeekly, openPlusMenu, openEntry, showRedFlag,
+  openStool, openDaily, openWeekly, openPlusMenu, openEntry, showRedFlag, fodBadge,
 } from './sheets.js';
 import { renderSettings, applyTheme, THEME_KEY } from './settings.js';
 import { renderCalendar, thisMonth } from './review.js';
@@ -57,6 +57,8 @@ function stat(num, label, cls = '') {
 
 function tag(text, cls = '') { return h('span', { class: 'tag ' + cls }, text); }
 
+const intakeTag = (id) => tag([intakeName(id), isFodmap(id) ? fodBadge() : null], 'g-' + groupOf(id));
+
 function stoolCard(e) {
   const d = e.data;
   const b = BRISTOL.find((x) => x.t === d.bristol);
@@ -83,7 +85,7 @@ function mealCard(e) {
   return h('button', { type: 'button', class: 'card', onclick: () => openEntry(e) },
     h('div', { class: 'card-time' }, fmtTime(e.at), h('span', { class: 'card-type' }, '食事')),
     h('div', { class: 'card-title' }, d.items.join('、') || '（タグのみ）'),
-    h('div', { class: 'card-tags left' }, d.tags.map((id) => tag(intakeName(id), 'g-' + groupOf(id))), amount ? tag('量 ' + amount) : null));
+    h('div', { class: 'card-tags left' }, d.tags.map(intakeTag), amount ? tag('量 ' + amount) : null));
 }
 
 function symptomCard(e) {
@@ -109,7 +111,8 @@ function dailyCard(e) {
       kv('おなら', `${d.gasFreq}/${d.gasSmell}`), kv('睡眠', SLEEP_LABEL[d.sleepHours]),
       kv('コーヒー', d.coffeeCups ?? 0), kv('エナドリ', d.energyDrinks ?? 0), kv('排便', stoolsOn(d.date).length ? `${stoolsOn(d.date).length}回` : d.noStool ? 'なし' : '—')),
     dishes.length ? h('div', { class: 'card-sub' }, '料理：' + dishes.join('、')) : null,
-    h('div', { class: 'card-tags left' }, (d.intake || []).map((id) => tag(intakeName(id), 'g-' + groupOf(id)))),
+    h('div', { class: 'card-tags left' }, (d.intake || []).map(intakeTag)),
+    (d.intake || []).some(isFodmap) ? h('div', { class: 'card-sub' }, fodBadge(), ` 高FODMAP ${(d.intake || []).filter(isFodmap).length}項目`) : null,
     opt.length ? h('div', { class: 'card-foot' }, opt.join(' ・ ')) : null,
     e.note ? h('div', { class: 'card-foot' }, 'メモ：' + e.note) : null);
 }

@@ -6,13 +6,14 @@ import { BRISTOL } from './config.js';
 import { ymd, today, pad } from './util.js';
 
 // 1日の状態
-// good：快調（腹痛と張りの最悪値が2以下で、排便がすべてブリストル3〜5）
+// 最悪値は腹痛・張り・胃もたれのうちいちばん高いもの
+// good：快調（最悪値が2以下で、排便がすべてブリストル3〜5）
 // mild：やや不調（最悪値が4〜6） / bad：つらい（最悪値が7以上）
 // normal：それ以外 / none：1日の記録なし
 export function dayStatus(date) {
   const daily = dailyFor(date);
   if (!daily) return 'none';
-  const worst = Math.max(daily.data.painMax, daily.data.bloatingMax);
+  const worst = Math.max(daily.data.painMax, daily.data.bloatingMax, daily.data.heavinessMax ?? 0);
   if (worst >= 7) return 'bad';
   if (worst >= 4) return 'mild';
   const stools = stoolsOn(date);
@@ -95,7 +96,7 @@ export function renderCalendar(ym, { onPick, onMonth }) {
         stat(count.mild + count.bad, '不調', count.bad ? 'bad' : ''),
         stat(stoolTotal, '排便'),
         stat(rate == null ? '—' : `${rate}%`, '良便率', 'good'))),
-    h('div', { class: 'note' }, '快調：腹痛と張りの最悪値が2以下で、排便がすべてブリストル3〜5の日。やや不調：最悪値4〜6。つらい：最悪値7以上。日付を押すとその日の記録を表示します。'));
+    h('div', { class: 'note' }, '最悪値は腹痛・張り・胃もたれのうちいちばん高いもの。快調：最悪値が2以下で、排便がすべてブリストル3〜5の日。やや不調：最悪値4〜6。つらい：最悪値7以上。日付を押すとその日の記録を表示します。'));
 }
 
 export const thisMonth = () => ymd(new Date()).slice(0, 7);

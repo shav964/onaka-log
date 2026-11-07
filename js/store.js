@@ -36,6 +36,13 @@ export async function load() {
     for (const a of ADDED_INTAKE) {
       if (a.since > ver && !list.some((x) => x.id === a.id)) list.push(DEFAULT_INTAKE.find((x) => x.id === a.id));
     }
+    // v3：既存の初期項目に高FODMAPのしるしを付ける（自分で付け外ししたものは触らない）
+    if (ver < 3) {
+      for (const it of list) {
+        const def = DEFAULT_INTAKE.find((x) => x.id === it.id);
+        if (it.fodmap === undefined && def?.fodmap) it.fodmap = def.fodmap;
+      }
+    }
     await setMeta('intake', list);
     await setMeta('intakeVersion', INTAKE_VERSION);
   }
@@ -86,6 +93,7 @@ export const byCount = (a, b) => (b.count || 0) - (a.count || 0) || a.name.local
 
 export const intakeName = (id) => state.intake.find((x) => x.id === id)?.name ?? id;
 export const groupOf = (id) => state.intake.find((x) => x.id === id)?.group;
+export const isFodmap = (id) => !!state.intake.find((x) => x.id === id)?.fodmap?.length;
 export const medName = (id) => state.meds.find((x) => x.id === id)?.name ?? id;
 
 export const dailyFor = (date) => state.entries.find((e) => e.type === 'daily' && e.data.date === date);
