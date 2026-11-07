@@ -168,10 +168,10 @@ export function openStool(existing, { presetDate } = {}) {
 /* ---------- 1日の記録 ---------- */
 
 const REQ_DAILY = [
-  ['painMax', '腹痛'], ['bloatingMax', '張り'], ['gasFreq', 'おならの頻度'],
+  ['painMax', '腹痛'], ['bloatingMax', '張り'], ['heavinessMax', '胃もたれ'], ['gasFreq', 'おならの頻度'],
   ['gasSmell', 'おならのにおい'], ['stress', 'ストレス'], ['sleepHours', '睡眠時間'],
 ];
-const COPY_KEYS = ['painMax', 'bloatingMax', 'gasFreq', 'gasSmell', 'stress', 'sleepHours',
+const COPY_KEYS = ['painMax', 'bloatingMax', 'heavinessMax', 'gasFreq', 'gasSmell', 'stress', 'sleepHours',
   'coffeeCups', 'energyDrinks', 'fatigue', 'mood', 'sleepQuality'];
 const OPTIONAL_KEYS = ['fatigue', 'mood', 'sleepQuality'];
 
@@ -246,6 +246,7 @@ export function openDaily(dateArg) {
         : prev ? h('div', { class: 'note' }, '前回の値が入っています。変わらない項目はそのまま保存でOK。') : null,
       field('腹痛（いちばん強かったとき）', scale(() => d.painMax, (v) => { d.painMax = v; }, severityText), { key: 'painMax', req: true }),
       field('張り・膨満感（いちばん強かったとき）', scale(() => d.bloatingMax, (v) => { d.bloatingMax = v; }, severityText), { key: 'bloatingMax', req: true }),
+      field('胃もたれ（いちばん強かったとき）', scale(() => d.heavinessMax, (v) => { d.heavinessMax = v; }, severityText), { key: 'heavinessMax', req: true }),
       field('おならの頻度', scale(() => d.gasFreq, (v) => { d.gasFreq = v; }, (v) => `${v}：${GAS_FREQ[v]}`, { max: 4 }), { key: 'gasFreq', req: true }),
       field('おならのにおい', scale(() => d.gasSmell, (v) => { d.gasSmell = v; }, (v) => `${v}：${GAS_SMELL[v]}`, { max: 3 }), { key: 'gasSmell', req: true }),
       field('ストレス', scale(() => d.stress, (v) => { d.stress = v; }, severityText), { key: 'stress', req: true }),

@@ -307,7 +307,7 @@ b { font-weight: 700; }
 .tag.g-depends { border-color: var(--warn); color: var(--warn); }
 .tag.g-worse { border-color: var(--bad); color: var(--bad); }
 
-.kv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
+.kv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 6px; }
 .kv-cell { border: 1px solid var(--line-2); padding: 2px 6px; display: flex; flex-direction: column; }
 .kv-cell span { font-size: 11px; color: var(--muted); }
 .kv-cell b { font-size: 15px; }

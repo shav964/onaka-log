@@ -105,7 +105,7 @@ function dailyCard(e) {
   return h('button', { type: 'button', class: 'card daily', onclick: () => openEntry(e) },
     h('div', { class: 'card-time' }, '1日の記録', h('span', { class: 'card-type' }, `入力 ${fmtDateTime(new Date(d.recordedAt))}`)),
     h('div', { class: 'kv-grid' },
-      kv('腹痛', d.painMax), kv('張り', d.bloatingMax), kv('ストレス', d.stress),
+      kv('腹痛', d.painMax), kv('張り', d.bloatingMax), kv('胃もたれ', d.heavinessMax ?? '—'), kv('ストレス', d.stress),
       kv('おなら', `${d.gasFreq}/${d.gasSmell}`), kv('睡眠', SLEEP_LABEL[d.sleepHours]),
       kv('コーヒー', d.coffeeCups ?? 0), kv('エナドリ', d.energyDrinks ?? 0), kv('排便', stoolsOn(d.date).length ? `${stoolsOn(d.date).length}回` : d.noStool ? 'なし' : '—')),
     dishes.length ? h('div', { class: 'card-sub' }, '料理：' + dishes.join('、')) : null,

@@ -270,8 +270,8 @@ IBSの重さを測る「IBS-SSS」という評価の構成を参考にした自�
 | --- | --- |
 | meal | items: 食べたもののリスト / tags: 食品タグのリスト / amount: small・normal・large |
 | stool | bristol 1〜7（必須） / refreshed: はい・いいえ（必須） / 以下は任意： amount: small・normal・large / color / mucus: none・some・much / floating: none・floats・oily / undigested 有無 / smell: usual・strong / toiletTime: lt5・5to10・gt10 / urgency・straining・incomplete・blood 有無 / good: 良便判定（自動） |
-| symptom | pain・bloating 0〜10（臨時記録・任意） |
-| daily | painMax・bloatingMax 0〜10 / stress 0〜10 / sleepHours: lt5・5to6・6to7・7to8・gt8 / intake: 今日とったものチェックのリスト / coffeeCups 0〜3 / energyDrinks 0〜2 / gasFreq 0〜4 / gasSmell 0〜3 / fatigue・mood・sleepQuality 0〜10（任意） / meds: 飲んだもののリスト / noStool: 排便なし確認 / date: どの日の記録か（自動判定） / recordedAt: 実際に入力した日時 |
+| symptom | pain・bloating・heaviness（胃もたれ） 0〜10（臨時記録・任意。どれか1つ以上） |
+| daily | painMax・bloatingMax・heavinessMax（胃もたれ） 0〜10 / stress 0〜10 / sleepHours: lt5・5to6・6to7・7to8・gt8 / intake: 今日とったものチェックのリスト / coffeeCups 0〜3 / energyDrinks 0〜2 / gasFreq 0〜4 / gasSmell 0〜3 / fatigue・mood・sleepQuality 0〜10（任意） / meds: 飲んだもののリスト / noStool: 排便なし確認 / date: どの日の記録か（自動判定） / recordedAt: 実際に入力した日時 |
 | weekly | painSeverity・bloatingSeverity・bowelDissatisfaction・lifeInterference 0〜100 / painDays10（自動） / total 0〜500 / adequateRelief はい・いいえ |
 
 **experiments（実験）**：名前、変えること、開始日、終了日、判定する指標、結果（改善・変化なし・悪化）。
